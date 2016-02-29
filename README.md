@@ -40,4 +40,5 @@ Accepted Characters:
 We recently built 10 of these Teensy-RGB-LEDs (Photos will follow...) and we intend to use the Teensy-RGB-LED for the following purposes
 - Show the status of a Test-PC in our Test-Farm
 - Use the LED as a Pomodoro-Status for everyone in the team, for the Pomodor-Technique see here:  https://en.wikipedia.org/wiki/Pomodoro_Technique (or even as a simple "Do-Not-Disturb-Now"-Indicator)
-- Use it as Wait/Ready - Indicator in Trainings : We currently are holding trainings on computers. With some networking scripts the trainer can set ALL Teensy-RGB-LEDs at all trainees-PCs e.g. to Red. The Trainee can then - when he is finished with his task at his PC - set the LED to Green. The trainer then has an easy control about the status of all trainees. 
+- Use it as Wait/Ready - Indicator in Trainings : We currently are holding trainings on computers. With some networking scripts the trainer can set ALL Teensy-RGB-LEDs at all trainees-PCs e.g. to Red. The Trainee can then - when he is finished with his task at his PC - set the LED to Green. The trainer then has an easy control about the status of all trainees.    The necessary software for this setup is done by Eric Keller, see here : https://github.com/erickeller/project-led.git
+- 
