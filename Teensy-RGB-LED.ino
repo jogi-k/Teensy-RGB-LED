@@ -30,6 +30,7 @@
 #define PIN 17
 
 int idle = 1;
+int flashing = 0;
 
 
 // Parameter 1 = number of pixels in strip
@@ -45,6 +46,13 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_RGB + NEO_KHZ800);
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
 // and minimize distance between Arduino and first pixel.  Avoid connecting
 // on a live circuit...if you must, connect GND first.
+
+enum flashmode
+{
+   start,
+   do_it,
+   stop
+};
 
 
 void setup() {
@@ -95,6 +103,14 @@ void loop()
          case 'o':
             colorWipe(strip.Color(0, 0, 0), 50); // off
             break;
+         case 'f':
+            flashing = 1;
+            flash( start );
+            break;
+         case 'n':
+            flashing = 0;
+            flash( stop );
+            break; 
          default:
             idle = oldIdle; // unknown character, so restore status and do nothing else.
             break;
@@ -103,6 +119,54 @@ void loop()
    if (idle == 1 )
    {   
       rainbowCycle( 20 );
+   }
+   if( flashing == 1 )
+   {
+      flash( do_it );
+   }
+}
+
+void flash( flashmode what )
+{
+   static int count = 0;
+   static int color = 0;
+   static int flashing = 0;
+   if ( what == start )
+   {
+      // avoid flashing when already flashing, this would lead in 50% of all cases to switched-off LED, when latching the color when it is off...
+      if( flashing == 0 )
+      {
+         color = strip.getPixelColor( 0 );
+         count = 49; 
+         flashing = 1;
+      } 
+   }
+   else if ( what == stop )
+   {
+      if( color != 0 )
+      {
+         colorWipe( color, 50 );
+      }
+      flashing = 0;
+   }
+   else
+   {
+      delay( 10 );
+      count++;
+      if ( count >= 50 )
+      {
+         count = 0;
+         if( color == 0 )
+         {
+            color = strip.getPixelColor( 0 );
+            colorWipe(strip.Color(0, 0, 0), 50); // off
+         }
+         else
+         {
+            colorWipe( color, 50 );
+            color = 0;
+         }
+      }
    }
 }
 
