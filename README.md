@@ -35,6 +35,10 @@ Accepted Characters:
 - w => white
 - o => off
 - i => idle, thats a rainbow
+New "Colors" as of 2016-03-13:
+- f => flashing
+- n => no-flashing
+
 
 ## Usage in "real life"
 We recently built 10 of these Teensy-RGB-LEDs (Photos will follow...) and we intend to use the Teensy-RGB-LED for the following purposes

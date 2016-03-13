@@ -22,9 +22,14 @@
  *  w => white
  *  o => off
  *  i => idle, thats a rainbow 
+ *  New "Colors" as of 2016-03-13
+ *  f => flashing
+ *  n => no-flashing
+ *  
  *  In addition single LEDs can be controlled, precede the color with the number of the LED, seperated
  *  by a colon.
  *  e.g. "2:g" will set LED Nr 2 (counting from 0) to green
+ *  e.g. "3:f" will set LED Nr 3 (counting from 0) to fashing with the current color
  *  In additon you can also send the "number" a for all LEDs.
  *  This means you can either send "a:r" or "r" to set all LEDs to red.
  *  
@@ -33,7 +38,9 @@
 #include <avr/power.h>
 
 #define PIN 17
+#define AMOUNT_LEDS 12
 int idle = 1;
+int flashing = 0;
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -42,12 +49,21 @@ int idle = 1;
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(12, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel( AMOUNT_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
 // and minimize distance between Arduino and first pixel.  Avoid connecting
 // on a live circuit...if you must, connect GND first.
+
+
+enum flashmode
+{
+   start,
+   do_it,
+   stop
+};
+
 
 
 void setup() {
@@ -68,21 +84,16 @@ void setup() {
   (r-val,g-val,b-val not yet implemented...)
 */
 
+
 void loop() 
 {
    String content = "";
-   char character;
    int AllLeds = 0;
    int LedNr = 0;
 
    if ( Serial.available() > 0 )
    { 
-      content = "";
-      while(Serial.available()) 
-      {
-         character = Serial.read();
-         content.concat(character);
-      }
+      content = GetSerialString();
       if (content != "") 
       {
          char ColorByte ;
@@ -109,85 +120,51 @@ void loop()
             AllLeds = 1;
          }
          int oldidle = idle;
+         int oldflashing = flashing;
          idle = 0;
          switch (ColorByte)
          {
             case 'r':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(255, 0, 0), 100); // Red
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(255,0,0));
-               }
+               SetSingleLedOrStripeToColor( strip.Color(255, 0, 0), LedNr, AllLeds, 100 ); // Red
                break;
             case 'g':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(0, 255, 0), 100); // Green 
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(0, 255, 0)); // Green
-               }
+               SetSingleLedOrStripeToColor( strip.Color(0, 255, 0), LedNr, AllLeds, 100 ); // Green
                break;
             case 'b':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(0, 0, 255), 100); // Blue
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(0,0,255)); // Blue
-                }
+               SetSingleLedOrStripeToColor( strip.Color(0, 0, 255), LedNr, AllLeds, 100 ); // Blue
                break;
             case 'p':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(255, 0, 255), 100); // Red + Blue
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(255,0,255)); // Red + Blue
-               }
+               SetSingleLedOrStripeToColor( strip.Color(255, 0, 255), LedNr, AllLeds, 100 ); // Red + Blue
                break;
             case 't':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(0, 255, 255), 100); // Green + Blue
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(0 , 255, 255)); // Green + Blue
-               }
+               SetSingleLedOrStripeToColor( strip.Color(0, 255, 255), LedNr, AllLeds, 100 );  // Green + Blue
                break;
             case 'y':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(255, 255, 0 ), 100); // Red + Green
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(255, 255, 0 )); // Red + Green
-               }
+               SetSingleLedOrStripeToColor( strip.Color(255, 255, 0 ), LedNr, AllLeds, 100 ); 
                break;
             case 'w':
-               if( AllLeds )
-               {
-                  AnimatedColorWipe( strip.Color(255, 255, 255), 100); // All 3
-               }
-               else
-               {
-                  ShowOneLed( LedNr, strip.Color(255,255,255)); // all 3
-               }
+               SetSingleLedOrStripeToColor( strip.Color(255, 255, 255), LedNr, AllLeds, 100 ); 
                break;
             case 'i':
                idle = 1;
                break;
             case 'o':
-               colorWipeInvers(strip.Color(0, 0, 0), 50); // off
+               if ( AllLeds == 1 )
+               {
+                  colorWipeInvers(strip.Color(0, 0, 0), 50); // off
+                  flashing = 0;
+               }
+               else
+               {
+                  ShowOneLed( LedNr, strip.Color(0, 0, 0) );
+               }
                break;
+            case 'f':
+                flashing = SetSingleLedOrStripeToFlashing( LedNr, AllLeds, start );
+                break;
+            case 'n':
+                flashing = SetSingleLedOrStripeToFlashing( LedNr, AllLeds, stop );
+                break;
             default:
                idle = oldidle;
                break;
@@ -198,7 +175,133 @@ void loop()
    {   
       rainbowCycle( 20 );
    }
+   if (flashing == 1 )
+   {
+      SetSingleLedOrStripeToFlashing( LedNr, AllLeds, do_it );
+   }
 }
+
+
+int SetSingleLedOrStripeToFlashing( int LedNr, int AllLeds, flashmode what  )
+{
+   static int count = 0;
+   static int color[AMOUNT_LEDS] = {0};
+   static int flashing[AMOUNT_LEDS] = {0};
+   static int led_high = 0;
+   static int flashing_overall = 0;
+   int i;
+   switch ( what )
+   {
+      case do_it:
+         delay( 10 );
+         count++;
+         if ( count >= 50 )
+         {
+            count = 0;
+            if( led_high == 1 )
+            {
+               for( i = 0; i < AMOUNT_LEDS; ++i )
+               {
+                  if( flashing[i] == 1 )
+                  {
+                     ShowOneLed( i, strip.Color(0, 0, 0) );
+                  }
+               }
+               led_high = 0;
+            }
+            else
+            {
+               for( i = 0; i < AMOUNT_LEDS; ++i )
+               {
+                  if( flashing[i] == 1 )
+                  {
+                     // color[i] = strip.getPixelColor( i );
+                     ShowOneLed( i, color[i] );
+                  }
+               }
+               led_high = 1;
+            }
+         }
+         break;
+      case start:
+         if( AllLeds == 1 )
+         {
+            for ( i = 0; i < AMOUNT_LEDS ; ++i )
+            {
+               color[i] = strip.getPixelColor( i );
+               flashing[i] = 1;
+            }
+         }
+         else
+         {
+            color[LedNr] = strip.getPixelColor( LedNr );
+            flashing[LedNr] = 1;
+         }
+         if( flashing_overall == 0 )
+         {          
+            count = 49;
+            flashing_overall = 1;
+         }
+         break;
+      case stop:
+         if( AllLeds == 1 )
+         {
+            for( i = 0; i < AMOUNT_LEDS ; ++i )
+            {
+               if( flashing[i] ==  1 )
+               {
+                  ShowOneLed( i, color[i] );
+               }
+               flashing[i] = 0;
+            }
+            flashing_overall = 0;
+         }
+         else
+         {
+            ShowOneLed( LedNr, color[LedNr] );
+            flashing[LedNr] = 0;
+            flashing_overall = 0;
+            for ( i = 0; i < AMOUNT_LEDS ; ++i )
+            {
+               if( flashing[i] == 1 )
+               {
+                  flashing_overall = 1;
+               }
+            }
+         }
+         break;
+   }
+   return flashing_overall;
+}
+
+
+String GetSerialString( void )
+{
+   char character;
+   String receive;
+   receive = "";
+   while(Serial.available()) 
+   {
+      character = Serial.read();
+      receive.concat(character);
+   }
+   return receive;
+}
+
+void SetSingleLedOrStripeToColor( uint32_t color, uint16_t LedNr, int AllLeds, uint8_t wait) 
+{
+   if( AllLeds )
+   {
+      AnimatedColorWipe( color, wait );
+   }
+   else
+   {
+      ShowOneLed( LedNr, color );
+   }
+}
+
+
+
 
 void ShowOneLed( uint16_t LedNr, uint32_t color )
 {
