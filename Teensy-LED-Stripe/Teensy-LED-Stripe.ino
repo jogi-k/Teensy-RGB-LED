@@ -30,6 +30,7 @@
  *  by a colon.
  *  e.g. "2:g" will set LED Nr 2 (counting from 0) to green
  *  e.g. "3:f" will set LED Nr 3 (counting from 0) to fashing with the current color
+ *  sending a new color will always stop flashing (for the affected LED) 
  *  In additon you can also send the "number" a for all LEDs.
  *  This means you can either send "a:r" or "r" to set all LEDs to red.
  *  
@@ -76,51 +77,20 @@ void setup() {
 }
 
 
-/*
-  String definition :
-  LedNr:Color
-  LedNr = 0 ... 8 | a
-  Color = red | blue | green | yellow | white | off | r-val,g-val,b-val 
-  (r-val,g-val,b-val not yet implemented...)
-*/
-
-
 void loop() 
 {
-   String content = "";
+   String SerialString = "";
    int AllLeds = 0;
    int LedNr = 0;
+   char ColorByte = 0 ;
 
    if ( Serial.available() > 0 )
    { 
-      content = GetSerialString();
-      if (content != "") 
+      SerialString  = GetSerialString();
+      if (SerialString  != "") 
       {
-         char ColorByte ;
-         int commaIndex = content.indexOf(':');
-         if ( commaIndex >= 0 )
-         {
-            String LedNrStr = content.substring( 0, commaIndex);
-            if( LedNrStr == "a" )
-            {
-               AllLeds = 1;
-            }
-            else
-            {
-               AllLeds = 0;
-               LedNr = LedNrStr.toInt();
-            }
-         
-            String Color = content.substring( commaIndex + 1 );
-            ColorByte = Color[0];
-         }
-         else // did not find a ':' This means : old behaviour, no selectable led and only simple colors 
-         {
-            ColorByte = content[0];
-            AllLeds = 1;
-         }
+         ParseString( &ColorByte, &AllLeds, &LedNr, SerialString  );
          int oldidle = idle;
-         int oldflashing = flashing;
          idle = 0;
          switch (ColorByte)
          {
@@ -180,6 +150,33 @@ void loop()
       SetSingleLedOrStripeToFlashing( LedNr, AllLeds, do_it );
    }
 }
+
+
+void  ParseString( char * ColorByte, int *AllLeds, int * LedNr, String SerialString  )
+{        
+   int commaIndex = SerialString.indexOf(':');
+   if ( commaIndex >= 0 )
+   {
+      String LedNrStr = SerialString.substring( 0, commaIndex);
+      if( LedNrStr == "a" )
+      {
+         *AllLeds = 1;
+      }
+      else
+      {
+         *AllLeds = 0;
+         *LedNr = LedNrStr.toInt();
+      }
+      String Color = SerialString.substring( commaIndex + 1 );
+      *ColorByte = Color[0];
+   }
+   else // did not find a ':' This means : old behaviour, no selectable led and only simple colors 
+   {
+      *ColorByte = SerialString[0];
+      *AllLeds = 1;
+   }
+}
+
 
 
 int SetSingleLedOrStripeToFlashing( int LedNr, int AllLeds, flashmode what  )
@@ -290,12 +287,14 @@ String GetSerialString( void )
 
 void SetSingleLedOrStripeToColor( uint32_t color, uint16_t LedNr, int AllLeds, uint8_t wait) 
 {
+   SetSingleLedOrStripeToFlashing( LedNr, AllLeds, stop );
    if( AllLeds )
    {
       AnimatedColorWipe( color, wait );
    }
    else
    {
+      
       ShowOneLed( LedNr, color );
    }
 }
