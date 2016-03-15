@@ -77,30 +77,46 @@ void loop()
       switch (inchar)
       {
          case 'r':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(255, 0, 0), 100); // Red
             break;
          case 'g':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(0, 255, 0), 100); // Green
             break;
          case 'b':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(0, 0, 255), 100); // Blue
             break;
          case 'p':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(255, 0, 255), 100); // Purple
             break;
          case 't':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(0, 255, 255), 100); // Turquoise
             break;
          case 'y':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(255, 255, 0), 100); // Yellow
             break;
          case 'w':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(255, 255, 255), 100); // white
             break;
          case 'i':
             idle = 1;
             break;
          case 'o':
+            flash( stop );
+            flashing = 0;
             colorWipe(strip.Color(0, 0, 0), 50); // off
             break;
          case 'f':
