@@ -255,15 +255,18 @@ int SetSingleLedOrStripeToFlashing( int LedNr, int AllLeds, flashmode what  )
          }
          else
          {
-            ShowOneLed( LedNr, color[LedNr] );
-            flashing[LedNr] = 0;
-            flashing_overall = 0;
-            for ( i = 0; i < AMOUNT_LEDS ; ++i )
+            if( flashing[LedNr] == 1 )
             {
-               if( flashing[i] == 1 )
-               {
-                  flashing_overall = 1;
-               }
+                ShowOneLed( LedNr, color[LedNr] );
+                flashing[LedNr] = 0;
+                flashing_overall = 0;
+                for ( i = 0; i < AMOUNT_LEDS ; ++i )
+                {
+                    if( flashing[i] == 1 )
+                    {
+                        flashing_overall = 1;
+                    }
+                }
             }
          }
          break;
