@@ -146,41 +146,47 @@ void flash( flashmode what )
 {
    static int count = 0;
    static int color = 0;
-   static int flashing = 0;
+   static int local_flashing = 0;
+   static int led_high = 1;
    if ( what == start )
    {
       // avoid flashing when already flashing, this would lead in 50% of all cases to switched-off LED, when latching the color when it is off...
-      if( flashing == 0 )
+      if( local_flashing == 0 )
       {
          color = strip.getPixelColor( 0 );
          count = 49; 
-         flashing = 1;
+         local_flashing = 1;
+         led_high = 1;
       } 
    }
    else if ( what == stop )
    {
-      if( color != 0 )
+      if( local_flashing )
       {
          colorWipe( color, 50 );
       }
-      flashing = 0;
+      local_flashing = 0;
    }
    else
    {
-      delay( 10 );
-      count++;
-      if ( count >= 50 )
+      if( local_flashing )
       {
-         count = 0;
-         if( color == 0 )
+         delay( 10 );
+      
+         count++;
+         if ( count >= 50 )
          {
-            color = strip.getPixelColor( 0 );
-            colorWipe(strip.Color(0, 0, 0), 50); // off
-         }
-         else
-         {
-            colorWipe( color, 50 );
-            color = 0;
+            count = 0;
+            if( led_high  )
+            {
+               colorWipe(strip.Color(0, 0, 0), 50); // off
+               led_high = 0;
+            }
+            else
+            {
+               colorWipe( color, 50 );
+               led_high = 1;
+            }
          }
       }
    }
