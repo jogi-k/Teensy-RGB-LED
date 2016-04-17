@@ -7,7 +7,7 @@
  * 
  * +5 V ------------------ LED +5v
  * GND  -------------------LED GND
- * Pin 17 --- 330 Ohm ---- LED Data In
+ * Pin 23 --- 330 Ohm ---- LED Data In
  *  
  *  The Software is based on the demonstrator 
  *  that is coming with the Adafruit-Neopixel Library
@@ -27,7 +27,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <avr/power.h>
 
-#define PIN 17
+#define PIN 23
 
 int idle = 1;
 int flashing = 0;
