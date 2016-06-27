@@ -39,7 +39,7 @@
 #include <avr/power.h>
 
 #define PIN 17
-#define AMOUNT_LEDS 16
+#define AMOUNT_LEDS 28
 int idle = 1;
 int flashing = 0;
 
