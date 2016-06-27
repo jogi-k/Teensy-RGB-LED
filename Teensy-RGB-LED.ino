@@ -28,6 +28,7 @@
 #include <avr/power.h>
 
 #define PIN 17
+#define version "1.00.01"
 
 int idle = 1;
 int flashing = 0;
@@ -127,13 +128,36 @@ void loop()
             flashing = 0;
             flash( stop );
             break; 
+         case 'v':
+            Serial.print("Version: ");
+            Serial.println(version);
+            idle = oldIdle;
+            break;
+         case 'h':
+            Serial.println("Help: known commands:");
+            Serial.println("i -> idle");
+            Serial.println("r -> red");
+            Serial.println("g -> green");
+            Serial.println("b -> blue");
+            Serial.println("y -> yellow");
+            Serial.println("p -> pink");
+            Serial.println("t -> turquoise");
+            Serial.println("w -> white");
+            Serial.println("o -> off");
+            Serial.println("f -> flash current color");
+            Serial.println("n -> no flash");
+            Serial.println("v -> version");
+            Serial.println("h -> this help");
+            idle = oldIdle;
+            break;
          default:
+         
             idle = oldIdle; // unknown character, so restore status and do nothing else.
             break;
       }
    }
    if (idle == 1 )
-   {   
+   { 
       rainbowCycle( 20 );
    }
    if( flashing == 1 )
@@ -142,45 +166,51 @@ void loop()
    }
 }
 
+#define HALF_SEC_COUNTER       50   // 50 intervals a DELAY_TIME_IN_LOOP = 10ms = half a second
+#define DELAY_TIME_IN_LOOP     10   // ms
+#define DELAY_FOR_ANIMATION    50   // ms 
+
 void flash( flashmode what )
 {
    static int count = 0;
    static int color = 0;
    static int flashing = 0;
+   static int led_high = 0;
    if ( what == start )
    {
       // avoid flashing when already flashing, this would lead in 50% of all cases to switched-off LED, when latching the color when it is off...
       if( flashing == 0 )
       {
          color = strip.getPixelColor( 0 );
-         count = 49; 
+         count = HALF_SEC_COUNTER - 1;  // counter expires "soon" 
          flashing = 1;
+         led_high = 1;
       } 
    }
    else if ( what == stop )
    {
       if( color != 0 )
       {
-         colorWipe( color, 50 );
+         colorWipe( color, DELAY_FOR_ANIMATION );
       }
       flashing = 0;
    }
    else
    {
-      delay( 10 );
+      delay( DELAY_TIME_IN_LOOP );
       count++;
-      if ( count >= 50 )
+      if ( count >= HALF_SEC_COUNTER  )
       {
          count = 0;
-         if( color == 0 )
+         if( led_high == 1 )
          {
-            color = strip.getPixelColor( 0 );
-            colorWipe(strip.Color(0, 0, 0), 50); // off
+            colorWipe(strip.Color(0, 0, 0), DELAY_FOR_ANIMATION ); // off
+            led_high = 0; 
          }
          else
          {
             colorWipe( color, 50 );
-            color = 0;
+            led_high = 1;
          }
       }
    }
