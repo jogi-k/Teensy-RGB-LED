@@ -30,8 +30,8 @@
 #define PIN 17
 #define version "1.00.01"
 
-int idle = 1;
-int flashing = 0;
+int idle = true;
+int doflashing = false;
 
 
 // Parameter 1 = number of pixels in strip
@@ -63,7 +63,7 @@ void setup() {
   strip.setBrightness( 70 );
   strip.show(); // Initialize all pixels to 'off'
   Serial.begin(9600);
-  idle = 1; 
+  idle = true; 
 }
 
 
@@ -73,59 +73,59 @@ void loop()
    {
       char inchar;
       int oldIdle = idle; // save idle-status. Will be restored in case of unknow character
-      idle = 0; // for most commands that will be the result: No idle, we will display a color.
+      idle = false; // for most commands that will be the result: No idle, we will display a color.
       inchar = Serial.read();
       switch (inchar)
       {
          case 'r':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(255, 0, 0), 100); // Red
             break;
          case 'g':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(0, 255, 0), 100); // Green
             break;
          case 'b':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(0, 0, 255), 100); // Blue
             break;
          case 'p':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(255, 0, 255), 100); // Purple
             break;
          case 't':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(0, 255, 255), 100); // Turquoise
             break;
          case 'y':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(255, 255, 0), 100); // Yellow
             break;
          case 'w':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(255, 255, 255), 100); // white
             break;
          case 'i':
-            idle = 1;
+            idle = true;
             break;
          case 'o':
             flash( stop );
-            flashing = 0;
+            doflashing = false;
             colorWipe(strip.Color(0, 0, 0), 50); // off
             break;
          case 'f':
-            flashing = 1;
+            doflashing = true;
             flash( start );
             break;
          case 'n':
-            flashing = 0;
+            doflashing = false;
             flash( stop );
             break; 
          case 'v':
@@ -151,16 +151,15 @@ void loop()
             idle = oldIdle;
             break;
          default:
-         
             idle = oldIdle; // unknown character, so restore status and do nothing else.
             break;
       }
    }
-   if (idle == 1 )
+   if (idle == true )
    { 
       rainbowCycle( 20 );
    }
-   if( flashing == 1 )
+   if( doflashing == true )
    {
       flash( do_it );
    }
@@ -174,17 +173,17 @@ void flash( flashmode what )
 {
    static int count = 0;
    static int color = 0;
-   static int flashing = 0;
-   static int led_high = 0;
+   static int flashing = false;
+   static int led_high = false;
    if ( what == start )
    {
       // avoid flashing when already flashing, this would lead in 50% of all cases to switched-off LED, when latching the color when it is off...
-      if( flashing == 0 )
+      if( flashing == false )
       {
          color = strip.getPixelColor( 0 );
          count = HALF_SEC_COUNTER - 1;  // counter expires "soon" 
-         flashing = 1;
-         led_high = 1;
+         flashing = true;
+         led_high = true;
       } 
    }
    else if ( what == stop )
@@ -193,7 +192,7 @@ void flash( flashmode what )
       {
          colorWipe( color, DELAY_FOR_ANIMATION );
       }
-      flashing = 0;
+      flashing = false;
    }
    else
    {
@@ -202,15 +201,15 @@ void flash( flashmode what )
       if ( count >= HALF_SEC_COUNTER  )
       {
          count = 0;
-         if( led_high == 1 )
+         if( led_high == true )
          {
             colorWipe(strip.Color(0, 0, 0), DELAY_FOR_ANIMATION ); // off
-            led_high = 0; 
+            led_high = false; 
          }
          else
          {
-            colorWipe( color, 50 );
-            led_high = 1;
+            colorWipe( color, DELAY_FOR_ANIMATION );
+            led_high = true;
          }
       }
    }
