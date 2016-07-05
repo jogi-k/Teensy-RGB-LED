@@ -5,9 +5,9 @@
  * Simple program to control a single Neo-Pixel WS2812-RGB-Led
  * Very simple schematics: 
  * 
- * +5 V ------------------ LED +5v
- * GND  -------------------LED GND
- * Pin 17 --- 330 Ohm ---- LED Data In
+ * +5 V --------------------- LED +5v
+ * GND  ----------------------LED GND
+ * Pin 17/23 --- 330 Ohm ---- LED Data In
  *  
  *  The Software is based on the demonstrator 
  *  that is coming with the Adafruit-Neopixel Library
@@ -27,7 +27,21 @@
 #include <Adafruit_NeoPixel.h>
 #include <avr/power.h>
 
-#define PIN 17
+/* Check Teensy and Version */
+#if TEENSYDUINO==127
+   #if ARDUINO==10607
+      #if F_CPU==16000000L
+         #define PIN 23
+      #elif F_CPU==48000000
+         #define PIN 17
+      #else
+         #error only checked for Teensy 2.0 and Teensy-LC. Remove checks when you know what you do 
+      #endif
+   #endif         
+#else
+#error only checked for Teensy 2.0 and Teensy-LC. Remove checks when you know what you do 
+#endif
+
 #define version "1.00.01"
 
 int idle = true;
