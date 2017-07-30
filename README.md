@@ -34,8 +34,10 @@ Accepted Characters:
 - y => yellow
 - w => white
 - o => off
-- i => idle, thats a rainbow
+- i => idle, thats a rainbow  
+
 New "Colors" as of 2016-03-13:
+
 - f => flashing
 - n => no-flashing
 
