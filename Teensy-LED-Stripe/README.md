@@ -5,7 +5,6 @@ A simple Teensy-Programm (written as Arduino-Sketch!) to control a WS2812-RGB-Le
 This is an extension of the Teensy-RGB-LED (see parent-directory)
 For all details see there, here I will only explain about the differences
 
-```
 ## Usage
 In addition single LEDs can be controlled, precede the color with the number of the LED, seperated by a colon.
 - e.g. "2:g" will set LED Nr 2 (counting from 0) to green
