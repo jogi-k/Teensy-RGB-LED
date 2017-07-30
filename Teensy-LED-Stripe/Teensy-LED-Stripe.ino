@@ -70,7 +70,7 @@ enum flashmode
 void setup() {
 
   strip.begin();
-  strip.setBrightness( 70 );
+  strip.setBrightness( 30 );
   strip.show(); // Initialize all pixels to 'off'
   Serial.begin(9600);
   idle = 1; 
@@ -143,6 +143,7 @@ void loop()
    }
    if (idle == 1 )
    {   
+      NewIdle( );
       rainbowCycle( 20 );
    }
    if (flashing == 1 )
@@ -302,8 +303,32 @@ void SetSingleLedOrStripeToColor( uint32_t color, uint16_t LedNr, int AllLeds, u
    }
 }
 
+void NewIdle( void )
+{
+   int i,j, del;
+   colorWipeInvers(strip.Color(0, 0, 0), 50); // off
+   for( i = AMOUNT_LEDS ; i > 0 ; i-- )
+   {
+      for ( j = 0 ; j < i; ++j )
+      {
+         del = ((AMOUNT_LEDS - i) > 10 )? ( AMOUNT_LEDS - i) : 10;  
+         FlashOneLed( j, Wheel( i * 10 ) , del );
+      }
+      ShowOneLed( i, Wheel( i * 10 ));
+       // delay ( 30 );
+       
+   }
+   ShowOneLed( 0, strip.Color(255, 0, 0));
+   delay ( 1000 );
+  
+}
 
-
+void FlashOneLed( uint16_t LedNr, uint32_t color, uint8_t wait )
+{
+   ShowOneLed( LedNr, color ); 
+   delay( wait );
+   ShowOneLed( LedNr, strip.Color(0, 0, 0) ); 
+}
 
 void ShowOneLed( uint16_t LedNr, uint32_t color )
 {
