@@ -34,7 +34,7 @@ Accepted Characters:
 - y => yellow
 - w => white
 - o => off
-- i => idle, thats a rainbow  
+- i => idle, thats a rainbow
 
 New "Colors" as of 2016-03-13:
 
@@ -52,14 +52,43 @@ We recently built 10 of these Teensy-RGB-LEDs (Photos will follow...) and we int
 This is how we built our 10 single LEDs:
 
  10 times Teensy :
- ![10 Teensy](Teensy_times_ten_sm.jpg)
+ ![10 Teensy](images/Teensy_times_ten_sm.jpg)
 
  10 times already prpepared tubes :
- ![10 Tubes](Tubes_times_ten_sm.jpg)
+ ![10 Tubes](images/Tubes_times_ten_sm.jpg)
 
  Teensy Detail :
- ![Detail](Teensy_detail_sm.jpg)
+ ![Detail](images/Teensy_detail_sm.jpg)
 
  The final solution :
- ![Final Solution](final_solution_sm.jpg)
+ ![Final Solution](images/final_solution_sm.jpg)
+
+## Controlling the LED from a PC
+
+As stated above, controlling the RGB-LED is rather easy.
+"Main problem" is to find out about the used serial-port on your PC.
+
+### Solution for Windows
+
+when plugging in the Teensy for the first time, you should see something similar to this in your windows:
+(Sorry, currently only have a german Windows-Installation available)
+![First Installation](images/Installed_Teensy.png)
+
+In case you missed that you have to ask your Device-Manager in the System-Settings:
+![Device Manager](images/System_Device-Manager_Com-Ports.png)
+
+Try out if that works in the CMD-Shell (ALT-F2 cmd):
+![Try out in CMD-Shell](images/Test-in-CMD-Shell.png)
+
+If that works: Use the examples in the examples-folder, adapt them to your needs and place a link to the appropriate Batch-File to your desktop.
+
+### Solution for Linux
+
+after plugging in you teensy call ____dmesg____ and you should see something like this:
+![dmesg after plug](images/linux_dmesg.png)
+
+Now you echo the wanted color to the repsective device ,
+e.g. ____echo b > /dev/ttyACM0____
+and put this into a shell-script.
+
 
