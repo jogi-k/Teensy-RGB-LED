@@ -70,25 +70,25 @@ As stated above, controlling the RGB-LED is rather easy.
 
 ### Solution for Windows
 
-when plugging in the Teensy for the first time, you should see something similar to this in your windows:
-(Sorry, currently only have a german Windows-Installation available)
+when plugging in the Teensy for the first time, you should see something similar to this in your windows:  
+(Sorry, currently only have a german Windows-Installation available)  
 ![First Installation](images/Installed_Teensy.png)
 
-In case you missed that you have to ask your Device-Manager in the System-Settings:
+In case you missed that you have to ask your Device-Manager in the System-Settings:  
 ![Device Manager](images/System_Device-Manager_Com-Ports.png)
 
-Try out if that works in the CMD-Shell (ALT-F2 cmd):
+Try out if that works in the CMD-Shell (ALT-F2 cmd):  
 ![Try out in CMD-Shell](images/Test-in-CMD-Shell.png)
 
 If that works: Use the examples in the examples-folder, adapt them to your needs and place a link to the appropriate Batch-File to your desktop.
 
 ### Solution for Linux
 
-after plugging in you teensy call ____dmesg____ and you should see something like this:
+after plugging in you teensy call ____dmesg____ and you should see something like this:  
 ![dmesg after plug](images/linux_dmesg.png)
 
-Now you echo the wanted color to the repsective device ,
-e.g. ____echo b > /dev/ttyACM0____
+Now you echo the wanted color to the repsective device,  
+e.g. ____echo b > /dev/ttyACM0____  
 and put this into a shell-script.
 
 
